@@ -38,6 +38,7 @@ A **modern, production-grade Laravel 11 stack** running fully in Docker — with
    cd Laravel-11-Mysql---PHPMyAdmin-Redis-Nginx-via-Docker
 
 ## START ALL SERVICES
-```bash docker compose up -d --build
+    ```bash 
+    docker compose up -d --build
 
 
