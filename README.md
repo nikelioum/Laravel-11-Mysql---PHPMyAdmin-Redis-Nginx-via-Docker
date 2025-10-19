@@ -37,8 +37,11 @@ A **modern, production-grade Laravel 11 stack** running fully in Docker — with
    git clone https://github.com/nikelioum/Laravel-11-Mysql---PHPMyAdmin-Redis-Nginx-via-Docker.git
    cd Laravel-11-Mysql---PHPMyAdmin-Redis-Nginx-via-Docker
 
-## START ALL SERVICES
-    ```bash 
-    docker compose up -d --build
+## 🚀 Start All Services
+
+Run the following command to build and start all containers in detached mode:
+
+```bash
+docker compose up -d --build
 
 
