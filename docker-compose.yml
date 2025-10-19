@@ -13,6 +13,7 @@ services:
     depends_on:
       - mysql
       - redis
+      - rabbitmq
 
   nginx:
     image: nginx:stable
@@ -58,6 +59,32 @@ services:
     restart: unless-stopped
     ports:
       - "6379:6379"
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    restart: unless-stopped
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: laravel
+      RABBITMQ_DEFAULT_PASS: secret
+
+  queue-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: laravel_queue_worker
+    restart: unless-stopped
+    working_dir: /var/www
+    volumes:
+      - ./src:/var/www
+    depends_on:
+      - rabbitmq
+      - redis
+      - mysql
+    command: bash -c "php artisan queue:work --sleep=3 --tries=3 --timeout=90"
 
 volumes:
   db_data:
