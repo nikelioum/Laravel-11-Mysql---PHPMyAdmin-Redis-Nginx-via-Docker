@@ -118,6 +118,16 @@ services:
     depends_on:
       - prometheus
 
+  rust-monitor:
+    build:
+      context: ./rust-monitor
+    container_name: rust-monitor
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    ports:
+      - "7071:7071"
+
   queue-worker:
     build:
       context: .
