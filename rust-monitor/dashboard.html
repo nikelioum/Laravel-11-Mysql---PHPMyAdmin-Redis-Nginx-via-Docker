@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Docker Live Monitor</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white min-h-screen flex flex-col items-center p-6">
+  <h1 class="text-3xl font-bold mb-6">🐳 Rust Monitor</h1>
+
+  <div id="filters" class="flex flex-wrap gap-2 justify-center mb-6"></div>
+
+  <canvas id="memChart" class="w-full max-w-4xl h-96 bg-gray-800 rounded-xl p-4"></canvas>
+
+  <script>
+    const ctx = document.getElementById('memChart');
+    const chart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: [],
+        datasets: [{
+          label: 'Memory (MB)',
+          data: [],
+          backgroundColor: 'rgba(59,130,246,0.7)'
+        }]
+      },
+      options: {
+        responsive: true,
+        scales: { y: { beginAtZero: true }, x: { ticks: { color: '#fff' } } },
+        plugins: { legend: { labels: { color: '#fff' } } }
+      }
+    });
+
+    let allData = [];
+    let activeContainers = new Set();
+
+    function renderFilters(names) {
+      const filtersDiv = document.getElementById("filters");
+      filtersDiv.innerHTML = "";
+      names.forEach(name => {
+        const id = name.replace("/", "");
+        const label = document.createElement("label");
+        label.className = "flex items-center space-x-2 bg-gray-800 px-3 py-1 rounded-lg cursor-pointer hover:bg-gray-700";
+        label.innerHTML = `<input type="checkbox" id="${id}" checked class="accent-blue-500"> <span>${name}</span>`;
+        filtersDiv.appendChild(label);
+
+        const checkbox = label.querySelector("input");
+        activeContainers.add(name);
+        checkbox.addEventListener("change", () => {
+          if (checkbox.checked) activeContainers.add(name);
+          else activeContainers.delete(name);
+          updateChart();
+        });
+      });
+    }
+
+    function updateChart() {
+      const filtered = allData.filter(c => activeContainers.has(c.name));
+      chart.data.labels = filtered.map(c => c.name.replace("/", ""));
+      chart.data.datasets[0].data = filtered.map(c => c.memory_usage_mb.toFixed(2));
+      chart.update();
+    }
+
+    const ws = new WebSocket("ws://" + location.host + "/ws");
+    ws.onmessage = e => {
+      const data = JSON.parse(e.data);
+      allData = data;
+      if (document.getElementById("filters").children.length === 0) {
+        renderFilters(data.map(c => c.name));
+      }
+      updateChart();
+    };
+  </script>
+</body>
+</html>
