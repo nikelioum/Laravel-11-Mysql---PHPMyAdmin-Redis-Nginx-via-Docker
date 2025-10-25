@@ -128,6 +128,15 @@ services:
     ports:
       - "7071:7071"
 
+  mailhog:
+    image: mailhog/mailhog
+    container_name: mailhog
+    restart: unless-stopped
+    ports:
+      - "1025:1025"   # SMTP
+      - "8025:8025"   # Web UI
+
+
   queue-worker:
     build:
       context: .
