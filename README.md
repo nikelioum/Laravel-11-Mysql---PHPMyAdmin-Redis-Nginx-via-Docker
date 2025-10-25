@@ -19,7 +19,7 @@ A modern, production-grade Laravel 12 stack running fully in Docker — with met
 | **Grafana** | Dashboards & analytics | http://localhost:3000 | admin / admin |
 | **cAdvisor** | Container metrics exporter | http://localhost:8081 | — |
 | **Node Exporter** | Host system metrics | http://localhost:9100/metrics | — |
-
+| **Rust Memory Monitor Service** | Memories resources for each container | Dashboard running at http://0.0.0.0:7071 | 
 ---
 
 ## 🧰 Requirements
