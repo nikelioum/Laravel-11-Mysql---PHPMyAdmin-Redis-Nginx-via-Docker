@@ -26,17 +26,27 @@ COPY --from=composer:2.7 /usr/bin/composer /usr/bin/composer
 # ------------------------------------------------------------
 WORKDIR /var/www
 
-# Copy Laravel project (for initial image build)
+# Copy Laravel project
 COPY ./src /var/www
 
 # ------------------------------------------------------------
-# 5. Expose PHP-FPM port
+# 5. Adjust permissions to match host user
+# ------------------------------------------------------------
+ARG UID=1000
+ARG GID=1000
+RUN usermod -u ${UID} www-data && groupmod -g ${GID} www-data && \
+    chown -R www-data:www-data /var/www
+
+# ------------------------------------------------------------
+# 6. Expose PHP-FPM port
 # ------------------------------------------------------------
 EXPOSE 9000
 
 # ------------------------------------------------------------
-# 6. Auto setup + start PHP-FPM safely
+# 7. Run Laravel setup and start PHP-FPM
 # ------------------------------------------------------------
+USER www-data
+
 CMD bash -c "\
 if [ ! -f /var/www/.env ]; then \
   echo 'Creating .env from .env.example...'; \
