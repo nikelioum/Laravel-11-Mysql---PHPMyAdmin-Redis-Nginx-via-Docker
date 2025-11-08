@@ -37,6 +37,8 @@ const submit = () => {
             {{ status }}
         </div>
 
+        <span class="inline-flex items-center gap-x-1.5 py-1.5 px-3 rounded-full text-xs font-medium bg-gray-800 text-white dark:bg-white dark:text-neutral-800">Badge</span>
+
         <form @submit.prevent="submit">
             <div>
                 <InputLabel for="email" value="Email" />
