@@ -5,7 +5,9 @@ FROM php:8.3-fpm
 # ------------------------------------------------------------
 RUN apt-get update && apt-get install -y \
     git curl zip unzip libpng-dev libonig-dev libxml2-dev libzip-dev \
-    && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd sockets
+    && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd sockets \
+    && pecl install redis \
+    && docker-php-ext-enable redis
 
 # ------------------------------------------------------------
 # 2. Install Node.js 20 + npm
@@ -33,12 +35,13 @@ COPY ./src /var/www
 EXPOSE 9000
 
 # ------------------------------------------------------------
-# 6. Auto setup + build + start PHP-FPM
+# 6. Auto setup + start PHP-FPM safely
 # ------------------------------------------------------------
 CMD bash -c "\
-composer install && \
-php artisan key:generate && \
-php artisan migrate --force && \
-npm install && \
-npm run build && \
+if [ ! -f /var/www/.env ]; then \
+  echo 'Creating .env from .env.example...'; \
+  cp .env.example .env; \
+  php artisan key:generate; \
+fi && \
+composer install --no-interaction --optimize-autoloader && \
 php-fpm"
